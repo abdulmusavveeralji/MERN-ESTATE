@@ -32,11 +32,23 @@ export const updateListing = async (req, res, next) => {
   if (req.user.id !== listing.userRef)
     return next(errorHandler(402, "you can update your own listing"));
   try {
-    const res = await Listing.findByIdAndUpdate(req.params.id, req.body, {
+    const data = await Listing.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-    const data = await res.json();
+
     res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) return next(errorHandler(401, "Listing not found"));
+
+    res.status(200).json(listing);
   } catch (error) {
     next(error);
   }
