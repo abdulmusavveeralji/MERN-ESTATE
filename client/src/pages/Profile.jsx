@@ -145,6 +145,27 @@ export default function Profile() {
       setListingsError(error.message);
     }
   };
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (data.success == false) {
+        console.log(data.message);
+        return false;
+      }
+      setUserListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+      return;
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -235,26 +256,33 @@ export default function Profile() {
         <div className="flex flex-col gap-4">
           <h1 className="font-semibold text-center text-2xl">Your Listings</h1>
           {userListings.map((listing) => (
-            <Link to={`/listing-${listing._id}`}>
-              <div
-                key={listing._id}
-                className="border gap-4 rounded-lg flex justify-between items-center p-3 hover:bg-gray-200 "
-              >
+            <div
+              key={listing._id}
+              className="border gap-4 rounded-lg flex justify-between  p-3 hover:bg-gray-200 items-center"
+            >
+              <Link to={`/listing-${listing._id}`}>
                 <img
                   src={listing.imageUrls[0]}
                   alt="listing image"
                   className="h-20 w-20 object-cover rounded-lg"
                 />
-                <p className="font-semibold truncate gap-4 flex-1">
-                  {listing.name}
-                </p>
-
-                <div className="flex flex-col">
-                  <button className="text-green-700 font-semibold">Edit</button>
-                  <button className="text-red-700 font-semibold">Delete</button>
-                </div>
+              </Link>
+              <Link
+                to={`/listing-${listing._id}`}
+                className="font-semibold truncate flex-1"
+              >
+                <p>{listing.name}</p>
+              </Link>
+              <div className="flex flex-col items-center">
+                <button className="text-green-700 font-semibold">Edit</button>
+                <button
+                  className="text-red-700 font-semibold"
+                  onClick={() => handleDeleteListing(listing._id)}
+                >
+                  Delete
+                </button>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
