@@ -1,5 +1,6 @@
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
+import User from "../models/user.model.js";
 
 export const createListing = async (req, res, next) => {
   try {
@@ -49,6 +50,19 @@ export const getListing = async (req, res, next) => {
     if (!listing) return next(errorHandler(401, "Listing not found"));
 
     res.status(200).json(listing);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUser = async (req, res, next) => {
+  try {
+    console.log("req", req);
+    const user = await User.findById(req.params.id);
+    if (!user) return next(errorHandler(404, "User not found"));
+    console.log("user", user);
+    const { password: pass, ...rest } = user._doc;
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }
